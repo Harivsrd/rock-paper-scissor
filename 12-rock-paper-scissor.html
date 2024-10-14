@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            background-color: rgb(25,25,25);
+            color: white;
+            font-family: arial;
+        }
+        .title{
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .move{
+            height: 45px;
+            object-fit: cover;
+        }
+        .move-button{
+            height: 120px;
+            width: 120px;
+            background-color: transparent;
+            border: 3px solid  white;
+            border-radius: 50%;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        .js-result{
+            font-weight: bold;
+            font-size: 25px;
+            margin-top: 50px;
+        }
+        .move-icon{
+            height: 50px;
+            
+        }
+        .js-move{
+            margin-bottom: 50px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <p class="title">ROCK PAPER SCISSOR</p>
+    <button class="move-button rock-button"
+    ><img src="rock-emoji.png" class="move"></button>
+    <button  class="move-button paper-button"
+    ><img src="paper-emoji.png" class="move">
+</button>
+
+    <button class="move-button scissor-button"><img src="scissor-emoji.png" class="move">
+    </button>
+
+    <p class="js-result"></p>
+    <p class="js-move">
+    </p>
+    <p class="js-score"></p>
+    <button onclick="
+    score.win =0;
+    score.lose =0;
+    score.tie =0;
+    localStorage.removeItem('score');
+    document.querySelector('.js-score').innerHTML = `Win : ${score.win}, Lose : ${score.lose}, Tie : ${score.tie}`;
+    ">
+        Reset score
+    </button>
+    <button class="js-auto-play" >Auto play</button>
+    <script>
+        let score = JSON.parse(localStorage.getItem('score')) ||{
+            win : 0,
+            lose : 0,
+            tie : 0
+        };
+        document.querySelector('.js-score').innerHTML = `Win : ${score.win}, Lose : ${score.lose}, Tie : ${score.tie}`;
+        
+        document.querySelector('.rock-button').addEventListener('click',()=>{
+            playgame('rock');
+        })
+
+        document.querySelector('.paper-button').addEventListener('click',()=>{
+            playgame('paper');
+        })
+
+        document.querySelector('.scissor-button').addEventListener('click',()=>{
+            playgame('scissor');
+        })
+        
+        document.querySelector('.js-auto-play').addEventListener('click',()=>{
+            autoplay();
+        })
+
+        document.body.addEventListener('keydown',(event)=>{
+            if (event.key === 'r'){
+                playgame('rock')
+            }
+            if (event.key === 'p'){
+                playgame('paper');
+            }
+            if(event.key === 's'){
+                playgame('scissor')
+            }
+        })
+        function playgame(playerchoice){
+                let compchoice = compmove();
+                if(playerchoice==='rock'){
+                    result=rock(compchoice);
+                }
+                else if(playerchoice ==='paper'){
+                    result = paper(compchoice);
+                }
+                else{
+                    result = scissor(compchoice);
+                }
+                console.log(result)
+                document.querySelector('.js-move').innerHTML = `You 
+        <img src="${playerchoice}-emoji.png" class="move-icon"><img src="${compchoice}-emoji.png" class="move-icon"> 
+        Computer`;
+                document.querySelector('.js-result').innerHTML = result;
+                updatescore(result);
+                //alert(`You entered ${playerchoice} . Computer choice ${compchoice} . Result ${result}\nWin : ${score.win},Lose : ${score.lose},Tie : ${score.tie}`);
+        }
+        let isautoplaying = false;
+            let intervalid;
+        function autoplay(){
+            document.querySelector('.js-auto-play').innerHTML = 'Stop Play'
+            if(!isautoplaying){
+            intervalid = setInterval(()=>{
+                const playermove = compmove();
+                playgame(playermove);
+            },1000)
+            isautoplaying = true;
+            
+            }
+            else{
+                clearInterval(intervalid);
+                document.querySelector('.js-auto-play').innerHTML = 'Auto play'
+                isautoplaying = false;
+            }
+    }
+        function updatescore(result){
+            if (result ===  'win')
+                score.win++;
+            else if (result === 'lose')
+                score.lose++;
+            else
+                score.tie++;
+                document.querySelector('.js-score').innerHTML = `Win : ${score.win}, Lose : ${score.lose}, Tie : ${score.tie}`;
+            localStorage.setItem('score',JSON.stringify(score));
+        }
+        function rock(compchoice){
+            let result='';
+            if(compchoice==='rock')
+                result= 'tie';
+            else if(compchoice==='paper')
+                result='lose';
+            else 
+                result='win';
+            return result;
+        }
+        function paper(compchoice){
+            let result='';
+            if (compchoice === 'paper')
+                result = 'tie';
+            else if (compchoice === 'scissor')
+                result = 'lose';
+            else
+                result = 'win';
+            return result;
+        }
+        function scissor(compchoice){
+            let result='';
+            if (compchoice ==='scissor')
+                result = 'tie';
+            else if (compchoice === 'rock')
+                result = 'lose';
+            else
+                result = 'win';
+            return result;
+        }
+        function  compmove(){
+        const n=Math.random();
+        let compmove='';
+        if(n>=0 && n<1/3)
+            compmove ='rock';
+        else if (n>=1/3 && n<2/3)
+            compmove = 'paper';
+        else if(n>=2/3 && n<1)
+            compmove = 'scissor';
+        return compmove;
+    }
+    </script>
+</body>
+</html>
